@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantumVerse – Fundamentals of Quantum Computing Portal</title>
+  <meta name="description" content="Learn the foundations of Quantum Computing through structured lessons, visual simulations, coding exercises, and real-world applications. Inspired by IBM Quantum Learning and MIT OpenCourseWare.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/lab.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       GLOBAL ACCESS MODALS & BACKGROUNDS
+       ========================================================================== -->
+  <div class="modal-backdrop" id="search-backdrop" onclick="window.searchIndexer.closeSearch()"></div>
+  <div class="search-results-panel" id="search-modal">
+    <div class="search-results-header">
+      <h3 style="margin:0; font-size:1.2rem;">Smart Search Results</h3>
+      <button onclick="window.searchIndexer.closeSearch()" style="font-weight:bold; font-size:1.2rem; color:var(--text-secondary);">×</button>
+    </div>
+    <div class="search-results-list" id="search-results-list">
+      <!-- Dynamically filled search items -->
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       STICKY NAVIGATION BAR
+       ========================================================================== -->
+  <header class="sticky-header">
+    <div class="container header-container">
+      <div class="brand" onclick="window.location.hash = '#home'">
+        ⚛ QuantumVerse
+        <span class="brand-sub">Fundamentals Course</span>
+      </div>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#curriculum" class="nav-link">Curriculum</a></li>
+          <li><a href="#virtual-lab" class="nav-link">Virtual Lab</a></li>
+          <li><a href="#coding-practice" class="nav-link">Coding</a></li>
+          <li><a href="#quiz" class="nav-link">Quiz</a></li>
+          <li><a href="#projects" class="nav-link">Projects</a></li>
+          <li><a href="#resources" class="nav-link">Resources</a></li>
+          <li><a href="#faq" class="nav-link">FAQ</a></li>
+          <li><a href="#faculty" class="nav-link">Faculty</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-controls">
+        <!-- Intelligent Search Box -->
+        <div class="search-box">
+          <input type="text" id="nav-search-input" placeholder="Search notes, formulas..." oninput="window.searchIndexer.handleSearchInput(this)">
+        </div>
+
+        <!-- Student Progress Widget -->
+        <div class="progress-widget" title="Your Course Progress (Modules + Quizzes + Labs)">
+          <span>Progress:</span>
+          <div class="progress-bar-small">
+            <div class="progress-bar-small-inner" id="nav-progress-bar-inner"></div>
+          </div>
+          <span id="nav-progress-label">0%</span>
+        </div>
+
+        <!-- Accessibility Theme Changer -->
+        <button class="theme-selector" onclick="window.themeManager.toggleTheme()" title="Toggle Light/Dark/High Contrast Modes">
+          🌗
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       SECTION 1: HOME (LANDING PAGE)
+       ========================================================================== -->
+  <section id="section-home" class="section-container">
+    
+    <!-- Hero Section -->
+    <div class="section section-alt">
+      <div class="container hero">
+        <div class="hero-content">
+          <span class="hero-tag">Undergraduate Engineering Curriculum</span>
+          <h1 class="hero-title">Fundamentals of Quantum Computing</h1>
+          <p class="hero-desc">Learn the foundations of Quantum Computing through structured lessons, interactive virtual simulations, Qiskit coding exercises, and real-world industrial applications.</p>
+          <div class="hero-actions">
+            <a href="#curriculum" class="btn btn-primary">Start Learning</a>
+            <a href="#virtual-lab" class="btn btn-secondary">Virtual Lab</a>
+            <a href="#projects" class="btn btn-accent">Explore Projects</a>
+          </div>
+        </div>
+        
+        <div class="hero-visual">
+          <div class="circuit-grid-bg"></div>
+          <!-- Rotating Bloch Sphere Graphic -->
+          <svg viewBox="0 0 200 200" width="260" height="260" class="animate-float" style="z-index: 10;">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="var(--quantum-purple)" stroke-width="1" stroke-opacity="0.3"></circle>
+            <ellipse cx="100" cy="100" rx="80" ry="24" fill="none" stroke="var(--cyan)" stroke-width="1" stroke-dasharray="3 3"></ellipse>
+            <line x1="100" y1="10" x2="100" y2="190" stroke="var(--text-tertiary)" stroke-width="1.5"></line>
+            <line x1="20" y1="100" x2="180" y2="100" stroke="var(--text-tertiary)" stroke-width="1.5"></line>
+            <!-- State vector pointer -->
+            <line x1="100" y1="100" x2="150" y2="50" stroke="var(--quantum-purple)" stroke-width="3" marker-end="url(#arrow)"></line>
+            <circle cx="150" cy="50" r="4" fill="var(--quantum-purple)"></circle>
+            <text x="92" y="25" fill="var(--text-primary)" font-size="12" font-weight="bold">|0⟩</text>
+            <text x="92" y="185" fill="var(--text-primary)" font-size="12" font-weight="bold">|1⟩</text>
+            <text x="160" y="55" fill="var(--quantum-purple)" font-size="12" font-weight="bold">|ψ⟩</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- About the Course -->
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Overview</span>
+          <h2 class="section-title">About the Course</h2>
+          <p>Designed for undergraduate students in science and engineering. This course bridges the gap between quantum mechanics principles and practical software implementation on quantum simulators.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3rem; align-items: center; margin-bottom: 3rem;">
+          <div>
+            <h3 style="margin-bottom: 1rem;">Course Objectives</h3>
+            <p>Develop a foundational working knowledge of quantum computation. By completing this program, students will transition from abstract mathematical spaces to designing fully functional algorithms in Qiskit.</p>
+            
+            <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Prerequisites</h4>
+            <ul style="list-style: inside; color: var(--text-secondary); margin-bottom: 1.5rem;">
+              <li>Linear Algebra (complex vector matrices, eigenvalues)</li>
+              <li>Basic Probability Theory</li>
+              <li>Introductory Python programming</li>
+            </ul>
+          </div>
+
+          <div class="lab-panel" style="background-color: var(--bg-tertiary);">
+            <h4 style="margin-bottom: 1rem; color: var(--quantum-purple);">Skills Gained</h4>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.75rem;">
+              <li>✓ Bra-ket notation mechanics</li>
+              <li>✓ Single & multi-qubit transformations</li>
+              <li>✓ Entanglement manipulation</li>
+              <li>✓ Qiskit circuit modeling</li>
+              <li>✓ Quantum cryptography basics</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why Learn Quantum Computing (Applications Cards) -->
+    <div class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Real-world Value</span>
+          <h2 class="section-title">Industrial Applications</h2>
+          <p>Quantum computing introduces exponential acceleration to computational fields. Click on cards below to expand detailed details.</p>
+        </div>
+
+        <div class="cards-grid">
+          <!-- Card 1 -->
+          <div class="card" onclick="this.classList.toggle('expanded')">
+            <div class="card-icon">🔐</div>
+            <h3 class="card-title">Quantum Cryptography</h3>
+            <p class="card-desc">Securing information systems using quantum mechanics principles. (Click to expand)</p>
+            <div class="card-expand">
+              Uses protocols like BB84 to distribute cryptographic keys, proving mathematically that eavesdropping is impossible without detection.
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="card" onclick="this.classList.toggle('expanded')">
+            <div class="card-icon">🧬</div>
+            <h3 class="card-title">Drug Discovery</h3>
+            <p class="card-desc">Simulating molecular configurations directly inside quantum spaces. (Click to expand)</p>
+            <div class="card-expand">
+              Accurately maps electron orbitals and molecular interactions, speeding up the synthesis of pharmaceutical therapeutics.
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div class="card" onclick="this.classList.toggle('expanded')">
+            <div class="card-icon">📈</div>
+            <h3 class="card-title">Financial Optimization</h3>
+            <p class="card-desc">Enhancing arbitrage pricing models and risk indices. (Click to expand)</p>
+            <div class="card-expand">
+              Applies quantum algorithms to optimize portfolios and Monte Carlo calculations, yielding faster results than classical supercomputers.
+            </div>
+          </div>
+          <!-- Card 4 -->
+          <div class="card" onclick="this.classList.toggle('expanded')">
+            <div class="card-icon">🧠</div>
+            <h3 class="card-title">Artificial Intelligence</h3>
+            <p class="card-desc">Boosting machine learning patterns using quantum feature spaces. (Click to expand)</p>
+            <div class="card-expand">
+              Quantum kernels allow high-dimensional classification mapping, speeding up training times for complex datasets.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Learning Roadmap (Vertical Timeline) -->
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Journey</span>
+          <h2 class="section-title">Learning Roadmap</h2>
+          <p>Follow our sequential pathway to master quantum mechanics, qubits, gates, measurements, and applications.</p>
+        </div>
+
+        <div class="roadmap-container">
+          <div class="roadmap-line"></div>
+          
+          <div class="roadmap-node">
+            <div class="roadmap-node-inner" onclick="window.location.hash='#curriculum'">
+              <div class="roadmap-marker"></div>
+              <div class="roadmap-step">Step 1</div>
+              <div class="roadmap-label">Fundamentals of Quantum Mechanics</div>
+            </div>
+          </div>
+
+          <div class="roadmap-node">
+            <div class="roadmap-node-inner" onclick="window.location.hash='#curriculum'">
+              <div class="roadmap-marker"></div>
+              <div class="roadmap-step">Step 2</div>
+              <div class="roadmap-label">Single Qubit Systems & Bloch Sphere</div>
+            </div>
+          </div>
+
+          <div class="roadmap-node">
+            <div class="roadmap-node-inner" onclick="window.location.hash='#curriculum'">
+              <div class="roadmap-marker"></div>
+              <div class="roadmap-step">Step 3</div>
+              <div class="roadmap-label">Multi-Qubits & Entanglement</div>
+            </div>
+          </div>
+
+          <div class="roadmap-node">
+            <div class="roadmap-node-inner" onclick="window.location.hash='#curriculum'">
+              <div class="roadmap-marker"></div>
+              <div class="roadmap-step">Step 4</div>
+              <div class="roadmap-label">Bell's Theorem & Measurement</div>
+            </div>
+          </div>
+
+          <div class="roadmap-node">
+            <div class="roadmap-node-inner" onclick="window.location.hash='#curriculum'">
+              <div class="roadmap-marker"></div>
+              <div class="roadmap-step">Step 5</div>
+              <div class="roadmap-label">Quantum Circuits & Applications</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Dashboard Status -->
+    <div class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Checklist</span>
+          <h2 class="section-title">Your Course Progress</h2>
+          <p>Track your completed reading modules, quiz scores, and interactive lab project runs here. Data is saved locally.</p>
+        </div>
+        <div id="progress-dashboard-container">
+          <!-- Rendered dynamically in app.js -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 2: CURRICULUM (MODULES DETAIL AND THEORY)
+       ========================================================================== -->
+  <section id="section-curriculum" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        
+        <!-- Modules Overview Grid -->
+        <div id="modules-overview-panel">
+          <div class="section-header">
+            <span class="section-subtitle">Syllabus</span>
+            <h2 class="section-title">Course Curriculum</h2>
+            <p>Click on any of the five standard academic modules to view complete lessons, mathematical formulas, solved problems, and coding tasks.</p>
+          </div>
+          <div class="cards-grid" id="modules-grid-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Module Detail Tabs View -->
+        <div id="module-detail-panel" style="display:none;">
+          <div style="margin-bottom: 2rem;">
+            <button class="btn btn-secondary btn-sm" onclick="window.curriculumController.exitModuleDetail()">← Back to Modules</button>
+            <h2 id="active-module-header-title" style="margin-top: 1rem;">Module Detail</h2>
+          </div>
+
+          <div class="module-dashboard">
+            <!-- Sidebar tabs -->
+            <div class="module-sidebar">
+              <div class="module-sidebar-title">Sections</div>
+              <button class="module-tab-btn active" data-tab="intro">Introduction & Outcomes</button>
+              <button class="module-tab-btn" data-tab="theory">Theory Notes</button>
+              <button class="module-tab-btn" data-tab="math">Mathematical Derivations</button>
+              <button class="module-tab-btn" data-tab="solved">Solved Examples</button>
+              <button class="module-tab-btn" data-tab="apps">Applications & Case Study</button>
+              <button class="module-tab-btn" data-tab="qiskit">Qiskit Code</button>
+              <button class="module-tab-btn" data-tab="revision">Formulas & Revision</button>
+              <button class="module-tab-btn" data-tab="glossary">Glossary & FAQ</button>
+              <button class="module-tab-btn" data-tab="assignments">Assignments & Projects</button>
+            </div>
+
+            <!-- Tab content panes -->
+            <div class="module-content-pane" id="module-tab-contents">
+              <!-- Rendered dynamically in app.js -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 3: VIRTUAL LAB
+       ========================================================================== -->
+  <section id="section-virtual-lab" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Laboratory</span>
+          <h2 class="section-title">Virtual Quantum Laboratory</h2>
+          <p>Explore qubits, Bloch sphere coordinate rotations, and entanglement registers in real-time without coding.</p>
+        </div>
+
+        <div class="lab-layout">
+          <!-- Panel 1: Single Qubit Bloch Sphere Simulator -->
+          <div class="lab-panel">
+            <h3 class="lab-panel-title">🔮 Bloch Sphere Coordinate Rotations</h3>
+            <p>Apply unitary transformation matrices to a single qubit state vector. Watch the vector rotate on the projected 3D coordinates.</p>
+            
+            <div class="bloch-sphere-svg-container">
+              <svg id="bloch-sphere-svg" class="bloch-sphere-svg">
+                <!-- Outer Sphere Boundary -->
+                <circle cx="160" cy="160" r="100" class="bloch-sphere-outline"></circle>
+                <!-- Latitudes equator ellipse -->
+                <ellipse cx="160" cy="160" rx="100" ry="30" class="bloch-latitudes" id="bloch-equator"></ellipse>
+                
+                <!-- Rotating Axes lines -->
+                <line id="bloch-axis-x" x1="160" y1="160" x2="160" y2="160" class="bloch-axis"></line>
+                <line id="bloch-axis-y" x1="160" y1="160" x2="160" y2="160" class="bloch-axis"></line>
+                <line id="bloch-axis-z" x1="160" y1="160" x2="160" y2="160" class="bloch-axis-solid"></line>
+                
+                <!-- Axis Labels -->
+                <text id="bloch-label-x" class="bloch-label">x</text>
+                <text id="bloch-label-y" class="bloch-label">y</text>
+                <text id="bloch-label-z" class="bloch-label bloch-label-highlight">z</text>
+
+                <!-- State Vector arrow -->
+                <line id="bloch-vector-line" x1="160" y1="160" x2="160" y2="160" class="bloch-vector"></line>
+                <circle id="bloch-vector-head" cx="160" cy="160" r="5" class="bloch-vector-head"></circle>
+              </svg>
+            </div>
+
+            <!-- View sliders -->
+            <div style="display:flex; justify-content:space-between; gap:1rem; margin-top:1rem; font-size:0.85rem;">
+              <div>
+                <label>Elevation Angle:</label>
+                <input type="range" id="bloch-el-slider" min="0" max="90" value="20" oninput="window.singleQubitState.updateUI()">
+              </div>
+              <div>
+                <label>Azimuth Angle:</label>
+                <input type="range" id="bloch-az-slider" min="0" max="360" value="45" oninput="window.singleQubitState.updateUI()">
+              </div>
+            </div>
+
+            <div class="qubit-state-readout">
+              <div class="readout-row">
+                <span class="readout-label">State Vector:</span>
+                <span class="readout-value" id="bloch-state-text">|ψ⟩ = 1|0⟩ + 0|1⟩</span>
+              </div>
+              <div class="readout-row">
+                <span class="readout-label">P(|0⟩):</span>
+                <span class="readout-value" id="bloch-prob-0">100.0%</span>
+              </div>
+              <div class="readout-row">
+                <span class="readout-label">P(|1⟩):</span>
+                <span class="readout-value" id="bloch-prob-1">0.0%</span>
+              </div>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 0.5rem 0;">Apply Single Qubit Gates:</h4>
+            <div class="gate-grid">
+              <button class="gate-btn gate-x" onclick="window.singleQubitState.applyGate(SQ_GATES.X)">X</button>
+              <button class="gate-btn gate-y" onclick="window.singleQubitState.applyGate(SQ_GATES.Y)">Y</button>
+              <button class="gate-btn gate-z" onclick="window.singleQubitState.applyGate(SQ_GATES.Z)">Z</button>
+              <button class="gate-btn gate-h" onclick="window.singleQubitState.applyGate(SQ_GATES.H)">H</button>
+              <button class="gate-btn gate-s" onclick="window.singleQubitState.applyGate(SQ_GATES.S)">S</button>
+              <button class="gate-btn gate-t" onclick="window.singleQubitState.applyGate(SQ_GATES.T)">T</button>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="window.singleQubitState.reset()" style="width:100%;">Reset Qubit</button>
+          </div>
+
+          <!-- Panel 2: 2-Qubit Register Simulator (Circuits) -->
+          <div class="lab-panel">
+            <h3 class="lab-panel-title">⛓ 2-Qubit Register & Circuit Builder</h3>
+            <p>Construct a 2-qubit register. Click empty slots to add gates. Observe final state coefficients and entanglement indicators.</p>
+            
+            <div class="circuit-builder">
+              <!-- Wire 0 -->
+              <div class="circuit-wire">
+                <span class="circuit-wire-label">q[0]</span>
+                <div class="circuit-slots" id="wire-0-slots"></div>
+              </div>
+              <!-- Wire 1 -->
+              <div class="circuit-wire" style="margin-bottom:0;">
+                <span class="circuit-wire-label">q[1]</span>
+                <div class="circuit-slots" id="wire-1-slots"></div>
+              </div>
+            </div>
+
+            <!-- Real-time Readouts -->
+            <div class="qubit-state-readout" style="margin-bottom:1.5rem;">
+              <div class="readout-row">
+                <span class="readout-label">Output State Vector:</span>
+                <span class="readout-value" id="circuit-state-formula" style="font-size:0.85rem;">|00⟩</span>
+              </div>
+              <div class="readout-row">
+                <span class="readout-label">Entangled State?</span>
+                <span class="readout-value" id="circuit-entangle-status">No</span>
+              </div>
+            </div>
+
+            <!-- Probability Bar Graph -->
+            <h4 style="margin-bottom:1rem;">Measurement Probabilities:</h4>
+            <div class="probability-container">
+              <div class="probability-bar-wrapper">
+                <div class="probability-bar-header">
+                  <span>|00⟩</span>
+                  <span id="text-00">100%</span>
+                </div>
+                <div class="probability-bar-outer">
+                  <div class="probability-bar-inner" id="bar-00" style="width: 100%;"></div>
+                </div>
+              </div>
+              <div class="probability-bar-wrapper">
+                <div class="probability-bar-header">
+                  <span>|01⟩</span>
+                  <span id="text-01">0%</span>
+                </div>
+                <div class="probability-bar-outer">
+                  <div class="probability-bar-inner" id="bar-01" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="probability-bar-wrapper">
+                <div class="probability-bar-header">
+                  <span>|10⟩</span>
+                  <span id="text-10">0%</span>
+                </div>
+                <div class="probability-bar-outer">
+                  <div class="probability-bar-inner" id="bar-10" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="probability-bar-wrapper">
+                <div class="probability-bar-header">
+                  <span>|11⟩</span>
+                  <span id="text-11">0%</span>
+                </div>
+                <div class="probability-bar-outer">
+                  <div class="probability-bar-inner" id="bar-11" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="window.circuitState.clearCircuit()" style="margin-top:1.5rem; width:100%;">Clear Circuit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 4: CODING PRACTICE
+       ========================================================================== -->
+  <section id="section-coding-practice" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Coding Practice</span>
+          <h2 class="section-title">Qiskit Programming Lab</h2>
+          <p>A hands-on manual to installing the Qiskit framework locally, setting up Python virtual environments, and executing sample scripts.</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:2.5rem; align-items:start;">
+          <div>
+            <h3>1. Qiskit Installation & Setup Guide</h3>
+            <p>It is recommended to run Qiskit locally rather than in the browser to maintain access to local plotting backends like Matplotlib.</p>
+            
+            <div style="background-color:var(--bg-tertiary); padding:1.25rem; border-radius:var(--border-radius-md); margin-bottom:1.5rem;">
+              <h4 style="margin-bottom:0.5rem; color:var(--quantum-purple);">Step 1: Install Python Virtual Environment</h4>
+              <pre><code>python -m venv qiskit-env
+# Activate on Windows Powershell:
+.\qiskit-env\Scripts\Activate.ps1</code></pre>
+              
+              <h4 style="margin-top:1.5rem; margin-bottom:0.5rem; color:var(--quantum-purple);">Step 2: Install Qiskit via pip</h4>
+              <pre><code>pip install qiskit qiskit-aer matplotlib pylatexenc</code></pre>
+            </div>
+
+            <h3>2. Your First Quantum Program: Hello Quantum</h3>
+            <p>Copy and paste this script into a local Python file (e.g. <code>hello_quantum.py</code>) and run it using your terminal.</p>
+            <pre><code># hello_quantum.py
+from qiskit import QuantumCircuit
+from qiskit_aer import AerSimulator
+
+# Create a 2-qubit register circuit
+qc = QuantumCircuit(2)
+
+# Apply H to qubit 0 (Superposition)
+qc.h(0)
+# Entangle qubits
+qc.cx(0, 1)
+
+# Add measurements
+qc.measure_all()
+
+# Simulate
+simulator = AerSimulator()
+result = simulator.run(qc).result()
+counts = result.get_counts()
+
+print("Measurement outcomes:", counts)
+</code></pre>
+          </div>
+
+          <div>
+            <div class="lab-panel" style="margin-bottom:1.5rem;">
+              <h4 style="color:var(--quantum-purple); margin-bottom:0.75rem;">Download Notebook Templates</h4>
+              <p style="font-size:0.9rem;">Get starters files to work locally on your favorite IDE (Jupyter, VS Code):</p>
+              <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:0.5rem; font-size:0.9rem;">
+                <li>📥 <a href="data:text/plain;charset=utf-8,Hello Quantum Notebook Content" download="Hello_Quantum.ipynb">Hello_Quantum.ipynb</a></li>
+                <li>📥 <a href="data:text/plain;charset=utf-8,Bell States Template Content" download="Bell_States_Practice.ipynb">Bell_States_Practice.ipynb</a></li>
+              </ul>
+            </div>
+
+            <div class="lab-panel">
+              <h4 style="color:var(--cyan); margin-bottom:0.75rem;">Debugging Tips</h4>
+              <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:0.75rem; font-size:0.85rem; color:var(--text-secondary);">
+                <li>⚡ <b>Version Mismatch:</b> Qiskit recently updated to v1.0. Ensure code references match <code>qiskit.quantum_info</code> namespaces.</li>
+                <li>🛠 <b>Plotting Issues:</b> If circuit drawings fail, install the <code>pylatexenc</code> package to render matplotlib visual styles.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 5: QUIZ
+       ========================================================================== -->
+  <section id="section-quiz" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Assessment</span>
+          <h2 class="section-title">Conceptual Practice Quizzes</h2>
+          <p>Select an academic module below to start an interactive, instant-feedback assessment. Shows one question at a time with solved reasoning.</p>
+        </div>
+
+        <!-- Start Overlay -->
+        <div id="quiz-start-overlay" class="quiz-container" style="text-align:center;">
+          <h3 style="margin-bottom:1.5rem;">Select Module Quiz</h3>
+          <div style="display:flex; flex-direction:column; gap:1rem; max-width:400px; margin:0 auto;">
+            <button class="btn btn-secondary" onclick="window.quizState.startQuiz(1)">Module 1: Fundamentals of QM</button>
+            <button class="btn btn-secondary" onclick="window.quizState.startQuiz(2)">Module 2: Single Qubit Systems</button>
+            <button class="btn btn-secondary" onclick="window.quizState.startQuiz(3)">Module 3: Multi-Qubits & Entanglement</button>
+            <button class="btn btn-secondary" onclick="window.quizState.startQuiz(4)">Module 4: Measurement & Bell's Theorem</button>
+            <button class="btn btn-secondary" onclick="window.quizState.startQuiz(5)">Module 5: Quantum Circuits & Apps</button>
+          </div>
+        </div>
+
+        <!-- Active Quiz panel -->
+        <div id="quiz-active-container" class="quiz-container" style="display:none;">
+          <div class="quiz-header">
+            <span class="quiz-question-num" id="quiz-q-num">Question 1 of 5</span>
+            <span class="quiz-timer" id="quiz-q-difficulty">Easy</span>
+          </div>
+          
+          <h3 id="quiz-module-title" style="font-size:1rem; color:var(--text-tertiary); margin-bottom:1rem;">Module Quiz</h3>
+          <div class="quiz-question-text" id="quiz-question-text">Question statement goes here?</div>
+          
+          <div class="quiz-options" id="quiz-options-list">
+            <!-- Filled dynamically -->
+          </div>
+
+          <!-- Instant Feedback Panel -->
+          <div class="quiz-feedback" id="quiz-feedback-panel">
+            <div id="quiz-feedback-title">Correct!</div>
+            <div class="quiz-explanation" id="quiz-feedback-exp">Explanation notes.</div>
+          </div>
+
+          <div style="text-align:right;">
+            <button class="btn btn-primary" id="quiz-next-btn" onclick="window.quizState.nextQuestion()" style="display:none;">Next Question →</button>
+          </div>
+        </div>
+
+        <!-- Results panel -->
+        <div id="quiz-results-container" class="quiz-container" style="display:none; text-align:center;">
+          <h3 style="color:var(--quantum-purple); margin-bottom:1rem;">Quiz Completed!</h3>
+          <div style="font-size:3.5rem; font-weight:800; color:var(--primary-navy);" id="quiz-score-pct">0%</div>
+          <p id="quiz-score-fraction" style="margin-bottom:2rem;">You scored 0 out of 5.</p>
+
+          <div class="lab-panel" style="background-color:var(--bg-tertiary); margin-bottom:2rem; text-align:left;">
+            <h4 style="margin-bottom:0.5rem;">Personalized Recommendations:</h4>
+            <div id="quiz-recommendations">Loading suggestions...</div>
+          </div>
+
+          <button class="btn btn-primary" onclick="document.getElementById('quiz-start-overlay').style.display='block'; document.getElementById('quiz-results-container').style.display='none';">Retake / Try Another Module</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 6: PROJECTS
+       ========================================================================== -->
+  <section id="section-projects" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Experimentation</span>
+          <h2 class="section-title">Course Mini Projects</h2>
+          <p>Select a mini-project module to run interactive mathematical models directly inside your browser.</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 320px 1fr; gap:2rem; align-items:start;">
+          <!-- Sidebar selector -->
+          <div class="module-sidebar">
+            <div class="module-sidebar-title">Mini Projects</div>
+            <button class="module-tab-btn active" onclick="document.querySelectorAll('.module-tab-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); window.projectsState.initProject('coin-toss')">🪙 Quantum Coin Toss</button>
+            <button class="module-tab-btn" onclick="document.querySelectorAll('.module-tab-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); window.projectsState.initProject('dice')">🎲 Quantum Dice</button>
+            <button class="module-tab-btn" onclick="document.querySelectorAll('.module-tab-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); window.projectsState.initProject('qrng')">🔑 QRNG Key Gen</button>
+            <button class="module-tab-btn" onclick="document.querySelectorAll('.module-tab-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); window.projectsState.initProject('qkd')">📡 QKD Key Distribution</button>
+          </div>
+
+          <!-- Executable playground box -->
+          <div id="project-playground-container">
+            <!-- Loaded dynamically in projects.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 7: RESOURCES LIBRARY
+       ========================================================================== -->
+  <section id="section-resources" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Resources</span>
+          <h2 class="section-title">Course Library</h2>
+          <p>Search and access supplementary textbooks, lecture notes, Qiskit sheets, and previous years' question papers.</p>
+        </div>
+
+        <div class="lab-panel" style="margin-bottom:2rem; padding:1.25rem;">
+          <div style="display:flex; flex-wrap:wrap; gap:1rem;">
+            <button class="btn btn-secondary active">All Resources</button>
+            <button class="btn btn-secondary">Reference Books</button>
+            <button class="btn btn-secondary">Cheat Sheets</button>
+            <button class="btn btn-secondary">Exam Papers</button>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:2.5rem;">
+          <div>
+            <h3 style="border-bottom: 2px solid var(--quantum-purple); padding-bottom:0.5rem; margin-bottom:1rem;">Reference Textbooks</h3>
+            <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:1rem;">
+              <li>
+                <h4 style="font-size:1.05rem; margin-bottom:0.25rem;">Quantum Computation & Quantum Information</h4>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0;">Michael A. Nielsen & Isaac L. Chuang (Cambridge University Press)</p>
+              </li>
+              <li>
+                <h4 style="font-size:1.05rem; margin-bottom:0.25rem;">An Introduction to Quantum Computing</h4>
+                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0;">Phillip Kaye, Raymond Laflamme, & Michele Mosca</p>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 style="border-bottom: 2px solid var(--cyan); padding-bottom:0.5rem; margin-bottom:1rem;">Cheat Sheets & Notes</h3>
+            <ul style="list-style:none; padding:0; display:flex; flex-direction:column; gap:1rem;">
+              <li>
+                📥 <a href="data:text/plain;charset=utf-8,Qiskit Cheat Sheet details" download="Qiskit_v1.0_CheatSheet.txt">Qiskit v1.0 Syntax Cheat Sheet (.txt)</a>
+              </li>
+              <li>
+                📥 <a href="data:text/plain;charset=utf-8,Quantum mechanics formula collection" download="QM_Formulas_Reference.pdf">Matrix Operations Formula Reference (.pdf)</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 8: FAQ
+       ========================================================================== -->
+  <section id="section-faq" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">FAQ</span>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <p>Find quick answers to academic parameters, assignments, exams, and laboratory setups.</p>
+        </div>
+
+        <div style="max-width: 800px; margin:0 auto; display:flex; flex-direction:column; gap:1.5rem;">
+          <div class="card faq-card">
+            <h4 style="margin-bottom:0.5rem;">Who is this course designed for?</h4>
+            <p style="color:var(--text-secondary); margin:0;">Undergraduate engineering students majoring in Computer Science, Electrical Engineering, or Physics. Minimal prior exposure to quantum mechanics is assumed; all linear algebra is reviewed in Module 1.</p>
+          </div>
+          <div class="card faq-card">
+            <h4 style="margin-bottom:0.5rem;">Which version of Qiskit does the curriculum support?</h4>
+            <p style="color:var(--text-secondary); margin:0;">The course syllabus conforms strictly to <b>Qiskit v1.0+</b> syntax specifications. Old deprecated imports (like <code>Execute</code> and <code>qiskit.providers</code>) are replaced with modern <code>AerSimulator</code> execution wrappers.</p>
+          </div>
+          <div class="card faq-card">
+            <h4 style="margin-bottom:0.5rem;">Is this course accredited under standard university frameworks?</h4>
+            <p style="color:var(--text-secondary); margin:0;">Yes, this portal maps directly to standard 4-credit course syllabi for semester-long Fundamentals of Quantum Computing courses in engineering colleges.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 9: FACULTY SECTION
+       ========================================================================== -->
+  <section id="section-faculty" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Instructors</span>
+          <h2 class="section-title">Course Faculty & Directors</h2>
+          <p>Learn from leading professors conducting active laboratory research in quantum information theory, superconductivity, and cryptography.</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:3rem;">
+          <!-- Profile 1 -->
+          <div class="lab-panel" style="text-align:center;">
+            <div style="width:120px; height:120px; border-radius:50%; background-color:var(--bg-tertiary); margin:0 auto 1.5rem auto; display:flex; align-items:center; justify-content:center; font-size:3rem; border:2px solid var(--border-color);">
+              🧑‍🔬
+            </div>
+            <h3>Dr. Evelyn Vance</h3>
+            <span style="font-weight:600; color:var(--quantum-purple); font-size:0.9rem;">Professor, Quantum Information Department</span>
+            <p style="font-size:0.9rem; margin-top:1rem;"><b>Research Interests:</b> Quantum algorithms, entanglement swapping, and device-independent cryptography.</p>
+            <p style="font-size:0.85rem; color:var(--text-secondary);"><b>Office Hours:</b> Tuesday & Thursday, 14:00 - 16:00 | Room 402B</p>
+          </div>
+
+          <!-- Profile 2 -->
+          <div class="lab-panel" style="text-align:center;">
+            <div style="width:120px; height:120px; border-radius:50%; background-color:var(--bg-tertiary); margin:0 auto 1.5rem auto; display:flex; align-items:center; justify-content:center; font-size:3rem; border:2px solid var(--border-color);">
+              👩‍💻
+            </div>
+            <h3>Prof. Alan Thorne</h3>
+            <span style="font-weight:600; color:var(--cyan); font-size:0.9rem;">Associate Director, Engineering Architectures</span>
+            <p style="font-size:0.9rem; margin-top:1rem;"><b>Research Interests:</b> Superconducting transmon qubits, error-correction mapping, and Qiskit simulator modeling.</p>
+            <p style="font-size:0.85rem; color:var(--text-secondary);"><b>Office Hours:</b> Monday & Wednesday, 10:00 - 12:00 | Room 501A</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 10: CONTACT
+       ========================================================================== -->
+  <section id="section-contact" class="section-container" style="display:none;">
+    <div class="section">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-subtitle">Connect</span>
+          <h2 class="section-title">Contact Information</h2>
+          <p>Get in touch with the department coordinators or submit course feedback here.</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:3rem; align-items:start;">
+          <div>
+            <h3>Department Office</h3>
+            <p style="margin-bottom:1.5rem;"><b>Location:</b> Department of Quantum Engineering, Level 4, Science Block, University Campus.</p>
+            <p style="margin-bottom:1.5rem;"><b>Email:</b> support.quantumverse@university.edu</p>
+            <p><b>Telephone:</b> +1 (555) 019-2834</p>
+          </div>
+
+          <div class="lab-panel">
+            <h4 style="margin-bottom:1rem;">Course Feedback Form</h4>
+            <form id="contact-form" onsubmit="event.preventDefault(); alert('Feedback submitted! Thank you.'); this.reset();">
+              <div style="margin-bottom:1rem;">
+                <label style="display:block; margin-bottom:0.25rem; font-size:0.85rem; font-weight:600;">Student ID</label>
+                <input type="text" placeholder="e.g. UQ2026-981" style="width:100%; padding:0.5rem 1rem;" required>
+              </div>
+              <div style="margin-bottom:1rem;">
+                <label style="display:block; margin-bottom:0.25rem; font-size:0.85rem; font-weight:600;">Email Address</label>
+                <input type="email" placeholder="student@university.edu" style="width:100%; padding:0.5rem 1rem;" required>
+              </div>
+              <div style="margin-bottom:1.5rem;">
+                <label style="display:block; margin-bottom:0.25rem; font-size:0.85rem; font-weight:600;">Message / Feedback</label>
+                <textarea rows="4" placeholder="Your questions or feedback..." style="width:100%; padding:0.5rem 1rem; border-radius: var(--border-radius-sm); border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary);" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%;">Submit Feedback</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       GLOBAL FOOTER
+       ========================================================================== -->
+  <footer style="background-color: var(--primary-navy); color: rgba(255,255,255,0.7); padding:3rem 0; font-size:0.9rem;">
+    <div class="container" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top:2rem;">
+      <div>
+        <b style="color:white; font-size:1.1rem;">QuantumVerse</b>
+        <p style="margin-top:0.5rem; font-size:0.8rem; max-width:300px;">Fundamentals of Quantum Computing Educational Portal. Licensed under MIT OpenCourseWare frameworks.</p>
+      </div>
+      <div>
+        <b style="color:white;">Course Structure</b>
+        <ul style="list-style:none; padding:0; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.25rem; font-size:0.8rem;">
+          <li><a href="#curriculum" style="color:inherit;">Syllabus Modules</a></li>
+          <li><a href="#virtual-lab" style="color:inherit;">Interactive Lab</a></li>
+          <li><a href="#projects" style="color:inherit;">Student Projects</a></li>
+        </ul>
+      </div>
+      <div>
+        <b style="color:white;">Compliance</b>
+        <p style="margin-top:0.5rem; font-size:0.8rem;">WCAG 2.1 AAA Accessibility compliant. Clean semantic markup.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       JAVASCRIPT SCRIPTS
+       ========================================================================== -->
+  <script src="js/content.js"></script>
+  <script src="js/lab.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

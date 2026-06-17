@@ -872,3 +872,21 @@ header.sticky-header {
     right: auto !important;
   }
 }
+
+/* Qiskit Sandbox Tab Buttons */
+.sandbox-tab-btn {
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.sandbox-tab-btn:hover {
+  background-color: var(--bg-primary) !important;
+  color: var(--quantum-purple) !important;
+}
+
+.sandbox-tab-btn.active {
+  background-color: var(--bg-primary) !important;
+  color: var(--quantum-purple) !important;
+  border-bottom: 2px solid var(--quantum-purple) !important;
+}
+

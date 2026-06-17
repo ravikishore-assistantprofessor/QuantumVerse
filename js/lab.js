@@ -449,18 +449,137 @@ window.circuitState = {
     }
   },
 
+  activeSelectionWire: null,
+  activeSelectionSlot: null,
+
   openGateSelector: function(wire, slot) {
-    // Open a prompt-free simple custom modal overlay or inline list for selection
-    const gateType = window.prompt("Enter gate to place (H, X, Y, Z, S, T, CX-ctrl, CX-targ):");
-    if (!gateType) return;
-    const cleanGate = gateType.trim().toUpperCase();
-    if (["H", "X", "Y", "Z", "S", "T", "CX-CTRL", "CX-TARG"].includes(cleanGate)) {
-      let finalGate = cleanGate;
-      if (cleanGate === "CX-CTRL") finalGate = "CX-ctrl";
-      if (cleanGate === "CX-TARG") finalGate = "CX-targ";
-      this.addGate(wire, slot, finalGate);
+    this.activeSelectionWire = wire;
+    this.activeSelectionSlot = slot;
+    
+    const wireLabel = document.getElementById("modal-wire-label");
+    const slotLabel = document.getElementById("modal-slot-label");
+    const modal = document.getElementById("gate-selector-modal");
+    const backdrop = document.getElementById("gate-backdrop");
+    
+    if (wireLabel) wireLabel.textContent = `q[${wire}]`;
+    if (slotLabel) slotLabel.textContent = slot;
+    if (modal) modal.style.display = "block";
+    if (backdrop) backdrop.style.display = "block";
+  },
+
+  closeGateSelector: function() {
+    const modal = document.getElementById("gate-selector-modal");
+    const backdrop = document.getElementById("gate-backdrop");
+    if (modal) modal.style.display = "none";
+    if (backdrop) backdrop.style.display = "none";
+    this.activeSelectionWire = null;
+    this.activeSelectionSlot = null;
+  },
+
+  selectGate: function(gateType) {
+    if (this.activeSelectionWire !== null && this.activeSelectionSlot !== null) {
+      this.addGate(this.activeSelectionWire, this.activeSelectionSlot, gateType);
+    }
+    this.closeGateSelector();
+  }
+};
+
+// --- Virtual Lab Tabs Controller ---
+window.labTabs = {
+  switchTab: function(tabId) {
+    const paneSims = document.getElementById("lab-pane-simulators");
+    const paneCalc = document.getElementById("lab-pane-calculator");
+    const btnSims = document.getElementById("lab-tab-simulators");
+    const btnCalc = document.getElementById("lab-tab-calculator");
+    
+    if (tabId === "simulators") {
+      if (paneSims) paneSims.style.display = "block";
+      if (paneCalc) paneCalc.style.display = "none";
+      if (btnSims) btnSims.classList.add("active");
+      if (btnCalc) btnCalc.classList.remove("active");
     } else {
-      alert("Invalid gate type. Choose H, X, Y, Z, S, T, CX-ctrl, or CX-targ.");
+      if (paneSims) paneSims.style.display = "none";
+      if (paneCalc) paneCalc.style.display = "block";
+      if (btnSims) btnSims.classList.remove("active");
+      if (btnCalc) btnCalc.classList.add("active");
+      window.matrixCalculator.calculate();
     }
   }
 };
+
+// --- Quantum Matrix and Tensor Calculator ---
+window.matrixCalculator = {
+  formatComplex: function(c) {
+    if (Math.abs(c.i) < 0.001) return c.r.toFixed(2);
+    if (Math.abs(c.r) < 0.001) return c.i.toFixed(2) + "i";
+    const sign = c.i >= 0 ? "+" : "-";
+    return `${c.r.toFixed(2)}${sign}${Math.abs(c.i).toFixed(2)}i`;
+  },
+  
+  formatVector: function(v) {
+    return "[" + v.map(c => this.formatComplex(c)).join(", ") + "]ᵀ";
+  },
+
+  calculate: function() {
+    const qubitA = document.getElementById("calc-qubit-a")?.value || "0";
+    const qubitB = document.getElementById("calc-qubit-b")?.value || "1";
+    const operator = document.getElementById("calc-operator")?.value || "H";
+    
+    const vectors = {
+      "0": [Complex.one(), Complex.zero()],
+      "1": [Complex.zero(), Complex.one()],
+      "plus": [Complex.create(1/Math.sqrt(2)), Complex.create(1/Math.sqrt(2))],
+      "minus": [Complex.create(1/Math.sqrt(2)), Complex.create(-1/Math.sqrt(2))],
+      "plus_i": [Complex.create(1/Math.sqrt(2)), Complex.create(0, 1/Math.sqrt(2))]
+    };
+    
+    const calcGates = {
+      ...SQ_GATES,
+      I: [
+        [Complex.one(), Complex.zero()],
+        [Complex.zero(), Complex.one()]
+      ]
+    };
+    
+    const psi_A = vectors[qubitA];
+    const psi_B = vectors[qubitB];
+    const U = calcGates[operator];
+    
+    // Compute U|ψ_A⟩
+    const applied = [
+      Complex.add(Complex.mul(U[0][0], psi_A[0]), Complex.mul(U[0][1], psi_A[1])),
+      Complex.add(Complex.mul(U[1][0], psi_A[0]), Complex.mul(U[1][1], psi_A[1]))
+    ];
+    
+    // Compute |ψ_A⟩ ⊗ |ψ_B⟩
+    const tensor = [
+      Complex.mul(psi_A[0], psi_B[0]),
+      Complex.mul(psi_A[0], psi_B[1]),
+      Complex.mul(psi_A[1], psi_B[0]),
+      Complex.mul(psi_A[1], psi_B[1])
+    ];
+    
+    // Render Gate Matrix
+    const matrixRender = document.getElementById("calc-gate-matrix-render");
+    if (matrixRender) {
+      const row0 = `[${this.formatComplex(U[0][0])}, ${this.formatComplex(U[0][1])}]`;
+      const row1 = `[${this.formatComplex(U[1][0])}, ${this.formatComplex(U[1][1])}]`;
+      matrixRender.textContent = `${operator} = [${row0}, ${row1}]`;
+    }
+    
+    // Render Applied Math
+    const appliedMath = document.getElementById("calc-applied-math");
+    if (appliedMath) {
+      const labels = { "0": "|0⟩", "1": "|1⟩", "plus": "|+⟩", "minus": "|-⟩", "plus_i": "|+i⟩" };
+      appliedMath.textContent = `${operator}${labels[qubitA]} = ${this.formatVector(applied)}`;
+    }
+    
+    // Render Tensor Math
+    const tensorMath = document.getElementById("calc-tensor-math");
+    if (tensorMath) {
+      const labels = { "0": "|0⟩", "1": "|1⟩", "plus": "|+⟩", "minus": "|-⟩", "plus_i": "|+i⟩" };
+      tensorMath.textContent = `${labels[qubitA]} ⊗ ${labels[qubitB]} = ${this.formatVector(tensor)}`;
+    }
+  }
+};
+

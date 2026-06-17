@@ -50,13 +50,13 @@ window.studentProgress = {
 
   updateNavbarProgress: function() {
     // Determine overall percentage completion
-    // Out of: 5 Modules, 4 Projects, 5 Quizzes (total 14 items)
+    // Out of: 5 Modules, 5 Projects, 5 Quizzes (total 15 items)
     const modulesCount = this.db.completedModules.length;
     const projectsCount = this.db.completedProjects.length;
     const quizzesCount = Object.keys(this.db.quizScores).length;
     
     const completed = modulesCount + projectsCount + quizzesCount;
-    const total = 14;
+    const total = 15;
     const pct = (completed / total) * 100;
 
     const bar = document.getElementById("nav-progress-bar-inner");
@@ -82,9 +82,9 @@ window.studentProgress = {
       `;
     }).join("");
 
-    const projHtml = ["coin-toss", "dice", "qrng", "qkd"].map(pid => {
+    const projHtml = ["coin-toss", "dice", "qrng", "qkd", "dj"].map(pid => {
       const done = this.db.completedProjects.includes(pid);
-      const labels = { "coin-toss": "Quantum Coin Toss", "dice": "Quantum Dice", "qrng": "QRNG Key Generator", "qkd": "BB84 Key Distribution" };
+      const labels = { "coin-toss": "Quantum Coin Toss", "dice": "Quantum Dice", "qrng": "QRNG Key Generator", "qkd": "BB84 Key Distribution", "dj": "Deutsch-Jozsa Algorithm" };
       return `
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px dashed var(--border-color);">
           <span style="font-weight: 500;">${labels[pid]}</span>

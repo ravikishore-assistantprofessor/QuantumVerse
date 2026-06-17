@@ -27,6 +27,26 @@
     </div>
   </div>
 
+  <!-- Custom Gate Selector Modal -->
+  <div class="modal-backdrop" id="gate-backdrop" onclick="window.circuitState.closeGateSelector()"></div>
+  <div class="search-results-panel" id="gate-selector-modal" style="max-width: 400px; padding: 1.5rem; display: none;">
+    <div class="search-results-header" style="border:none; padding:0 0 1rem 0; margin-bottom:1rem;">
+      <h3 style="margin:0; font-size:1.2rem; color:var(--quantum-purple);">Select Gate</h3>
+      <button onclick="window.circuitState.closeGateSelector()" style="font-weight:bold; font-size:1.2rem; color:var(--text-secondary);">×</button>
+    </div>
+    <p style="font-size:0.9rem; margin-bottom:1.5rem; color:var(--text-secondary);">Select a quantum gate to place at wire <b id="modal-wire-label">q[0]</b>, slot <b id="modal-slot-label">0</b>:</p>
+    <div class="gate-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
+      <button class="gate-btn gate-h" style="padding:1rem;" onclick="window.circuitState.selectGate('H')">H</button>
+      <button class="gate-btn gate-x" style="padding:1rem;" onclick="window.circuitState.selectGate('X')">X</button>
+      <button class="gate-btn gate-y" style="padding:1rem;" onclick="window.circuitState.selectGate('Y')">Y</button>
+      <button class="gate-btn gate-z" style="padding:1rem;" onclick="window.circuitState.selectGate('Z')">Z</button>
+      <button class="gate-btn gate-s" style="padding:1rem;" onclick="window.circuitState.selectGate('S')">S</button>
+      <button class="gate-btn gate-t" style="padding:1rem;" onclick="window.circuitState.selectGate('T')">T</button>
+      <button class="gate-btn gate-cnot-control" style="padding:0.75rem 0.5rem; grid-column: span 3; font-size:0.85rem;" onclick="window.circuitState.selectGate('CX-ctrl')">● CNOT Control</button>
+      <button class="gate-btn gate-cnot-target" style="padding:0.75rem 0.5rem; grid-column: span 3; font-size:0.85rem;" onclick="window.circuitState.selectGate('CX-targ')">⊕ CNOT Target</button>
+    </div>
+  </div>
+
   <!-- ==========================================================================
        STICKY NAVIGATION BAR
        ========================================================================== -->
@@ -333,8 +353,17 @@
           <p>Explore qubits, Bloch sphere coordinate rotations, and entanglement registers in real-time without coding.</p>
         </div>
 
-        <div class="lab-layout">
-          <!-- Panel 1: Single Qubit Bloch Sphere Simulator -->
+        <!-- Virtual Lab Tabs -->
+        <div class="lab-panel" style="margin-bottom: 2.5rem; padding: 1rem; border-radius: var(--border-radius-md);">
+          <div style="display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap;">
+            <button class="btn btn-secondary active" id="lab-tab-simulators" onclick="window.labTabs.switchTab('simulators')" style="padding:0.6rem 1.25rem; font-size:0.95rem;">🔮 Interactive Simulators</button>
+            <button class="btn btn-secondary" id="lab-tab-calculator" onclick="window.labTabs.switchTab('calculator')" style="padding:0.6rem 1.25rem; font-size:0.95rem;">🧮 Quantum Matrix Calculator</button>
+          </div>
+        </div>
+
+        <div id="lab-pane-simulators">
+          <div class="lab-layout">
+            <!-- Panel 1: Single Qubit Bloch Sphere Simulator -->
           <div class="lab-panel">
             <h3 class="lab-panel-title">🔮 Bloch Sphere Coordinate Rotations</h3>
             <p>Apply unitary transformation matrices to a single qubit state vector. Watch the vector rotate on the projected 3D coordinates.</p>
@@ -476,6 +505,82 @@
             <button class="btn btn-secondary" onclick="window.circuitState.clearCircuit()" style="margin-top:1.5rem; width:100%;">Clear Circuit</button>
           </div>
         </div>
+        </div> <!-- End #lab-pane-simulators -->
+
+        <!-- Quantum Mathematics Calculator -->
+        <div id="lab-pane-calculator" style="display:none;">
+          <div class="lab-panel">
+            <h3 class="lab-panel-title">🧮 Quantum Linear Algebra & Matrix Calculator</h3>
+            <p>Calculate tensor products and apply gates to qubit vectors. Witness the transformation matrices and step-by-step mathematics in real time.</p>
+            
+            <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap:2.5rem; margin-top:1.5rem; align-items:start;">
+              <div>
+                <h4 style="color:var(--quantum-purple); margin-bottom:1rem; font-size:1.1rem;">1. Choose Inputs</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+                  <div>
+                    <label style="font-weight:600; font-size:0.85rem; display:block; margin-bottom:0.5rem; color:var(--text-secondary);">Qubit A (|ψ_A⟩):</label>
+                    <select id="calc-qubit-a" onchange="window.matrixCalculator.calculate()" style="width:100%; padding:0.5rem 1rem; border-radius:var(--border-radius-sm); border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary);">
+                      <option value="0">|0⟩ = [1, 0]ᵀ</option>
+                      <option value="1">|1⟩ = [0, 1]ᵀ</option>
+                      <option value="plus">|+⟩ = [1/√2, 1/√2]ᵀ</option>
+                      <option value="minus">|-⟩ = [1/√2, -1/√2]ᵀ</option>
+                      <option value="plus_i">|+i⟩ = [1/√2, i/√2]ᵀ</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-weight:600; font-size:0.85rem; display:block; margin-bottom:0.5rem; color:var(--text-secondary);">Qubit B (|ψ_B⟩):</label>
+                    <select id="calc-qubit-b" onchange="window.matrixCalculator.calculate()" style="width:100%; padding:0.5rem 1rem; border-radius:var(--border-radius-sm); border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary);">
+                      <option value="0">|0⟩ = [1, 0]ᵀ</option>
+                      <option value="1" selected>|1⟩ = [0, 1]ᵀ</option>
+                      <option value="plus">|+⟩ = [1/√2, 1/√2]ᵀ</option>
+                      <option value="minus">|-⟩ = [1/√2, -1/√2]ᵀ</option>
+                      <option value="plus_i">|+i⟩ = [1/√2, i/√2]ᵀ</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <h4 style="color:var(--quantum-purple); margin-bottom:1rem; font-size:1.1rem;">2. Apply Operator to Qubit A</h4>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem;">
+                  <div>
+                    <label style="font-weight:600; font-size:0.85rem; display:block; margin-bottom:0.5rem; color:var(--text-secondary);">Gate Operator (U):</label>
+                    <select id="calc-operator" onchange="window.matrixCalculator.calculate()" style="width:100%; padding:0.5rem 1rem; border-radius:var(--border-radius-sm); border:1px solid var(--border-color); background:var(--bg-secondary); color:var(--text-primary);">
+                      <option value="I">Identity (I)</option>
+                      <option value="H" selected>Hadamard (H)</option>
+                      <option value="X">Pauli-X (NOT)</option>
+                      <option value="Y">Pauli-Y</option>
+                      <option value="Z">Pauli-Z</option>
+                      <option value="S">S Gate (Phase π/2)</option>
+                      <option value="T">T Gate (Phase π/4)</option>
+                    </select>
+                  </div>
+                  <div style="display:flex; align-items:flex-end;">
+                    <div style="font-family:var(--font-mono); font-size:0.85rem; font-weight:700; background-color:var(--bg-tertiary); padding:0.5rem 1rem; border-radius:var(--border-radius-sm); border:1px solid var(--border-color); color:var(--text-primary);" id="calc-gate-matrix-render">
+                      H = [[0.71, 0.71], [0.71, -0.71]]
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="lab-panel" style="background-color:var(--bg-tertiary);">
+                <h4 style="color:var(--cyan); margin-bottom:1rem; font-size:1.1rem;">Calculation Output</h4>
+                <div style="display:flex; flex-direction:column; gap:1.25rem; font-size:0.9rem;">
+                  <div>
+                    <span style="font-weight:600; color:var(--text-primary);">Applied State: U|ψ_A⟩</span>
+                    <div id="calc-applied-math" style="font-family:var(--font-mono); background-color:var(--bg-secondary); padding:0.6rem; border-radius:6px; margin-top:0.4rem; border:1px solid var(--border-color); font-weight:600; color:var(--text-primary);">
+                      H|+⟩ = [1, 0]ᵀ = |0⟩
+                    </div>
+                  </div>
+                  <div>
+                    <span style="font-weight:600; color:var(--text-primary);">Tensor Product: |ψ_A⟩ ⊗ |ψ_B⟩</span>
+                    <div id="calc-tensor-math" style="font-family:var(--font-mono); background-color:var(--bg-secondary); padding:0.6rem; border-radius:6px; margin-top:0.4rem; border:1px solid var(--border-color); font-weight:600; color:var(--text-primary);">
+                      |0⟩ ⊗ |1⟩ = |01⟩ = [0, 1, 0, 0]ᵀ
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -490,6 +595,62 @@
           <span class="section-subtitle">Coding Practice</span>
           <h2 class="section-title">Qiskit Programming Lab</h2>
           <p>A hands-on manual to installing the Qiskit framework locally, setting up Python virtual environments, and executing sample scripts.</p>
+        </div>
+
+        <!-- Interactive Sandbox Panel -->
+        <div class="lab-panel" style="margin-bottom: 3.5rem; background: var(--bg-secondary); border: 1px solid var(--border-color);">
+          <h3 class="lab-panel-title" style="color:var(--quantum-purple); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+            <span>⚡ Interactive Qiskit Code Sandbox (Run in Browser)</span>
+            <div style="display:flex; gap:0.5rem; align-items:center; font-size:0.9rem;">
+              <span style="font-weight:600; color:var(--text-secondary);">Template:</span>
+              <select id="sandbox-template-select" onchange="window.qiskitSandbox.loadTemplate(this.value)" style="padding: 0.3rem 0.6rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); font-size:0.85rem; background:var(--bg-secondary); color:var(--text-primary);">
+                <option value="bell">Bell State (|Φ⁺⟩ Entanglement)</option>
+                <option value="superposition">Hadamard Superposition</option>
+                <option value="cnot">CNOT Gate Test</option>
+                <option value="multi">3-Qubit GHZ State</option>
+              </select>
+            </div>
+          </h3>
+          <p>Write standard Qiskit Python code below. Our local compiler compiles and simulates the execution in real-time inside your browser, drawing the quantum circuit and plotting measurement counts.</p>
+          
+          <div style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:2rem; margin-top:1.5rem; align-items:stretch;">
+            <!-- Code Editor Side -->
+            <div style="display:flex; flex-direction:column; gap:1rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.85rem; font-weight:700; color:var(--text-secondary); font-family:var(--font-mono);">editor.py</span>
+                <button class="btn btn-primary" onclick="window.qiskitSandbox.runCode()" style="padding:0.4rem 1.25rem; font-size:0.9rem;">Run Code ▶</button>
+              </div>
+              <textarea id="sandbox-code-editor" style="width:100%; height:340px; font-family:var(--font-mono); font-size:0.9rem; padding:1.25rem; border-radius:var(--border-radius-md); line-height:1.55; background-color:var(--primary-navy); color:#00FFCC; border:none; resize:none; outline:none; box-shadow:var(--shadow-sm);" spellcheck="false"></textarea>
+            </div>
+            
+            <!-- Output Side -->
+            <div style="display:flex; flex-direction:column; border:1px solid var(--border-color); border-radius:var(--border-radius-md); background-color:var(--bg-primary); overflow:hidden;">
+              <!-- Tabs -->
+              <div style="display:flex; background-color:var(--bg-tertiary); border-bottom:1px solid var(--border-color);">
+                <button class="sandbox-tab-btn active" id="sandbox-tab-circuit" onclick="window.qiskitSandbox.switchTab('circuit')" style="flex:1; border:none; background:none; padding:0.85rem 0.5rem; font-size:0.85rem; font-weight:700; color:var(--quantum-purple); border-right:1px solid var(--border-color); cursor:pointer; text-align:center;">Circuit Diagram</button>
+                <button class="sandbox-tab-btn" id="sandbox-tab-histogram" onclick="window.qiskitSandbox.switchTab('histogram')" style="flex:1; border:none; background:none; padding:0.85rem 0.5rem; font-size:0.85rem; font-weight:700; color:var(--text-secondary); border-right:1px solid var(--border-color); cursor:pointer; text-align:center;">Probability Histogram</button>
+                <button class="sandbox-tab-btn" id="sandbox-tab-console" onclick="window.qiskitSandbox.switchTab('console')" style="flex:1; border:none; background:none; padding:0.85rem 0.5rem; font-size:0.85rem; font-weight:700; color:var(--text-secondary); cursor:pointer; text-align:center;">Standard Output</button>
+              </div>
+              
+              <!-- Tab Panels -->
+              <div style="flex-grow:1; padding:1.5rem; position:relative; overflow:auto; display:flex; flex-direction:column; justify-content:center; align-items:center; min-height: 320px;">
+                <!-- Circuit SVG Container -->
+                <div id="sandbox-pane-circuit" style="width:100%; display:flex; justify-content:center; align-items:center; overflow-x:auto;">
+                  <!-- Rendered dynamically -->
+                </div>
+                <!-- Histogram Container -->
+                <div id="sandbox-pane-histogram" style="width:100%; display:none;">
+                  <div class="probability-container" id="sandbox-histogram-bars">
+                    <!-- Rendered dynamically -->
+                  </div>
+                </div>
+                <!-- Console Container -->
+                <div id="sandbox-pane-console" style="width:100%; height:100%; display:none; align-self:flex-start;">
+                  <pre style="background:none; border:none; margin:0; padding:0; color:var(--text-primary); font-family:var(--font-mono); font-size:0.85rem; white-space:pre-wrap; line-height:1.5;" id="sandbox-console-text">Click "Run Code" to view program output...</pre>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div style="display:grid; grid-template-columns: 2fr 1fr; gap:2.5rem; align-items:start;">
@@ -642,6 +803,7 @@ print("Measurement outcomes:", counts)
             <button class="module-tab-btn" onclick="document.querySelectorAll('.module-tab-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); window.projectsState.initProject('dice')">🎲 Quantum Dice</button>
             <button class="module-tab-btn" onclick="document.querySelectorAll('.module-tab-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); window.projectsState.initProject('qrng')">🔑 QRNG Key Gen</button>
             <button class="module-tab-btn" onclick="document.querySelectorAll('.module-tab-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); window.projectsState.initProject('qkd')">📡 QKD Key Distribution</button>
+            <button class="module-tab-btn" onclick="document.querySelectorAll('.module-tab-btn').forEach(b => b.classList.remove('active')); this.classList.add('active'); window.projectsState.initProject('dj')">🖥 Deutsch-Jozsa Algorithm</button>
           </div>
 
           <!-- Executable playground box -->
@@ -848,6 +1010,7 @@ print("Measurement outcomes:", counts)
   <script src="js/lab.js"></script>
   <script src="js/quiz.js"></script>
   <script src="js/projects.js"></script>
+  <script src="js/sandbox.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

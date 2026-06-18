@@ -427,6 +427,66 @@ window.curriculumController = {
           <p><b>Evaluation Rubric:</b> ${mod.miniProject.rubric}</p>
         </div>
       </div>
+
+      <!-- 10. Slides (PPT) -->
+      <div class="tab-pane" id="pane-slides">
+        <h3>Lecture Slide Presentations</h3>
+        <p>Select a subtopic to review its associated lecture slide presentation deck.</p>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Select Subtopic:</label>
+          <select id="slides-subtopic-select" style="width: 100%; padding: 0.5rem 1rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+            ${mod.subtopics ? mod.subtopics.map((st, sidx) => `<option value="${sidx}">${st.raw_title}</option>`).join("") : ""}
+          </select>
+        </div>
+        <div id="slides-viewer-panel">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- 11. Audio Podcast -->
+      <div class="tab-pane" id="pane-podcast">
+        <h3>Audio Lesson & Synced Transcript</h3>
+        <p>Listen to the audio overview of the lesson or follow along with the transcript read-aloud via speech synthesis.</p>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Select Subtopic:</label>
+          <select id="podcast-subtopic-select" style="width: 100%; padding: 0.5rem 1rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+            ${mod.subtopics ? mod.subtopics.map((st, sidx) => `<option value="${sidx}">${st.raw_title}</option>`).join("") : ""}
+          </select>
+        </div>
+        <div id="podcast-player-panel">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- 12. Interactive Simulators -->
+      <div class="tab-pane" id="pane-sim">
+        <h3>Interactive Conceptual Simulators</h3>
+        <p>Explore the physical behaviors of the systems described in this module.</p>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Select Simulation:</label>
+          <select id="sim-subtopic-select" style="width: 100%; padding: 0.5rem 1rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+            ${mod.subtopics ? mod.subtopics.filter(st => st.sim && st.sim.trim().length > 0).map((st, sidx) => `<option value="${st.topic_id}">${st.raw_title}</option>`).join("") : ""}
+          </select>
+        </div>
+        <div id="sim-viewer-panel">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- 13. References -->
+      <div class="tab-pane" id="pane-refs">
+        <h3>References & Additional Reading</h3>
+        <p>Consult the primary textbooks, reference manuals, and online resources used for this topic.</p>
+        <div style="margin-bottom: 1.5rem;">
+          <label style="font-weight: 600; display: block; margin-bottom: 0.5rem;">Select Subtopic:</label>
+          <select id="refs-subtopic-select" style="width: 100%; padding: 0.5rem 1rem; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+            ${mod.subtopics ? mod.subtopics.map((st, sidx) => `<option value="${sidx}">${st.raw_title}</option>`).join("") : ""}
+          </select>
+        </div>
+        <div id="refs-viewer-panel">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
     `;
 
     // Make tab buttons click listeners
@@ -447,8 +507,260 @@ window.curriculumController = {
         document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
         // Show selected pane
         document.getElementById(`pane-${tabId}`).classList.add("active");
+        
+        // Stop any running speech synthesis podcasts when switching tabs
+        if (tabId !== 'podcast') {
+          window.speechSynthesis.cancel();
+        }
       };
     });
+
+    // --- Slides Controller ---
+    let activeSlideIndex = 0;
+    const updateSlideView = () => {
+      const select = document.getElementById('slides-subtopic-select');
+      if (!select) return;
+      const subtopicIdx = parseInt(select.value);
+      const subtopic = mod.subtopics[subtopicIdx];
+      const viewer = document.getElementById('slides-viewer-panel');
+      if (!viewer || !subtopic) return;
+      
+      viewer.innerHTML = subtopic.slides;
+      
+      const slideItems = viewer.querySelectorAll('.slide-item');
+      const total = slideItems.length;
+      
+      const showSlide = (idx) => {
+        slideItems.forEach((s, sIdx) => {
+          s.style.display = sIdx === idx ? 'block' : 'none';
+        });
+        const prevBtn = document.getElementById('slide-prev-btn');
+        const nextBtn = document.getElementById('slide-next-btn');
+        const counter = document.getElementById('slide-counter-label');
+        if (prevBtn) prevBtn.disabled = idx === 0;
+        if (nextBtn) nextBtn.disabled = idx === total - 1;
+        if (counter) counter.textContent = `${idx + 1} / ${total}`;
+      };
+      
+      const navDiv = document.createElement('div');
+      navDiv.className = 'slide-nav';
+      navDiv.style.cssText = 'display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 1rem;';
+      navDiv.innerHTML = `
+        <button id="slide-prev-btn" class="btn btn-secondary btn-sm">← Prev</button>
+        <span id="slide-counter-label" class="slide-counter">1 / ${total}</span>
+        <button id="slide-next-btn" class="btn btn-secondary btn-sm">Next →</button>
+      `;
+      viewer.appendChild(navDiv);
+      
+      document.getElementById('slide-prev-btn').onclick = () => {
+        if (activeSlideIndex > 0) {
+          activeSlideIndex--;
+          showSlide(activeSlideIndex);
+        }
+      };
+      document.getElementById('slide-next-btn').onclick = () => {
+        if (activeSlideIndex < total - 1) {
+          activeSlideIndex++;
+          showSlide(activeSlideIndex);
+        }
+      };
+      
+      activeSlideIndex = 0;
+      showSlide(0);
+    };
+    
+    const selectSlides = document.getElementById('slides-subtopic-select');
+    if (selectSlides) {
+      selectSlides.onchange = updateSlideView;
+      updateSlideView();
+    }
+
+    // --- Podcast Controller ---
+    let currentUtterance = null;
+    let podcastTickInterval = null;
+    let podcastRate = 1.0;
+    let podcastStart = 0;
+    let podcastDuration = 0;
+    let podcastPaused = false;
+    let podcastActive = false;
+
+    const stopPodcast = () => {
+      window.speechSynthesis.cancel();
+      if (podcastTickInterval) {
+        clearInterval(podcastTickInterval);
+        podcastTickInterval = null;
+      }
+      podcastActive = false;
+      podcastPaused = false;
+      const playBtn = document.getElementById('pod-play-btn');
+      const progress = document.getElementById('pod-progress-fill');
+      const timer = document.getElementById('pod-timer-label');
+      if (playBtn) playBtn.textContent = '▶ Play';
+      if (progress) progress.style.width = '0%';
+      if (timer) timer.textContent = '0:00';
+    };
+
+    const updatePodcastView = () => {
+      stopPodcast();
+      const select = document.getElementById('podcast-subtopic-select');
+      if (!select) return;
+      const subtopicIdx = parseInt(select.value);
+      const subtopic = mod.subtopics[subtopicIdx];
+      const viewer = document.getElementById('podcast-player-panel');
+      if (!viewer || !subtopic) return;
+      
+      viewer.innerHTML = `
+        <div class="pod-wrap">
+          <div class="pod-header" style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+            <div class="pod-art" style="width:70px; height:70px; border-radius:10px; background:linear-gradient(135deg,var(--quantum-purple),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:2rem; color:white;">🎙</div>
+            <div>
+              <div class="pod-title" style="font-weight:700; color:var(--text-primary); font-size:1.1rem;">Lecture Audio Guide</div>
+              <div class="pod-sub" style="font-size:0.85rem; color:var(--text-secondary); margin-top:2px;">Topic: ${subtopic.raw_title}</div>
+            </div>
+          </div>
+          <div class="pod-controls" style="display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" id="pod-skip-back-btn">⏮ -15s</button>
+            <button class="btn btn-primary" id="pod-play-btn" style="padding:0.5rem 1.25rem;">▶ Play</button>
+            <button class="btn btn-secondary btn-sm" id="pod-skip-fwd-btn">15s ⏭</button>
+            <div class="pod-progress" id="pod-progress-bar" style="flex:1; height:8px; background:var(--bg-tertiary); border-radius:4px; cursor:pointer; min-width:120px; position:relative; border:1px solid var(--border-color);">
+              <div class="pod-prog-fill" id="pod-progress-fill" style="height:100%; width:0%; background:var(--quantum-purple); border-radius:4px; pointer-events:none;"></div>
+            </div>
+            <span class="pod-time" id="pod-timer-label" style="font-size:0.85rem; font-family:var(--font-mono); color:var(--text-secondary);">0:00</span>
+            <button class="btn btn-secondary btn-sm" id="pod-speed-btn">1.0×</button>
+          </div>
+          <div class="pod-transcript" style="background:var(--bg-tertiary); border-radius:8px; padding:1rem; max-height:180px; overflow-y:auto; font-size:0.9rem; color:var(--text-secondary); line-height:1.6; border:1px solid var(--border-color);" id="pod-transcript-text">
+            ${subtopic.transcript || 'No transcript available.'}
+          </div>
+        </div>
+      `;
+
+      const playBtn = document.getElementById('pod-play-btn');
+      const speedBtn = document.getElementById('pod-speed-btn');
+      const progressFill = document.getElementById('pod-progress-fill');
+      const timerLabel = document.getElementById('pod-timer-label');
+      
+      const togglePlay = () => {
+        if (!podcastActive) {
+          const txt = subtopic.transcript || "";
+          currentUtterance = new SpeechSynthesisUtterance(txt);
+          currentUtterance.rate = podcastRate;
+          currentUtterance.lang = 'en-US';
+          
+          currentUtterance.onend = () => {
+            stopPodcast();
+          };
+
+          podcastStart = Date.now();
+          const wordCount = txt.split(/\s+/).length || 1;
+          podcastDuration = wordCount * 450; // ms
+          
+          window.speechSynthesis.speak(currentUtterance);
+          podcastActive = true;
+          podcastPaused = false;
+          playBtn.textContent = '⏸ Pause';
+          
+          podcastTickInterval = setInterval(() => {
+            if (podcastPaused) return;
+            const elapsed = Date.now() - podcastStart;
+            const pct = Math.min(100, (elapsed / (podcastDuration / podcastRate)) * 100);
+            progressFill.style.width = pct + '%';
+            
+            const sec = Math.round(elapsed / 1000);
+            timerLabel.textContent = `${Math.floor(sec / 60)}:${sec % 60 < 10 ? '0' : ''}${sec % 60}`;
+          }, 100);
+        } else {
+          if (podcastPaused) {
+            window.speechSynthesis.resume();
+            podcastPaused = false;
+            playBtn.textContent = '⏸ Pause';
+          } else {
+            window.speechSynthesis.pause();
+            podcastPaused = true;
+            playBtn.textContent = '▶ Play';
+          }
+        }
+      };
+
+      playBtn.onclick = togglePlay;
+      
+      speedBtn.onclick = () => {
+        const rates = [1.0, 1.25, 1.5, 0.75];
+        const curIdx = rates.indexOf(podcastRate);
+        podcastRate = rates[(curIdx + 1) % rates.length];
+        speedBtn.textContent = `${podcastRate.toFixed(2)}×`;
+        if (podcastActive) {
+          stopPodcast();
+          togglePlay();
+        }
+      };
+      
+      document.getElementById('pod-skip-back-btn').onclick = () => {
+        if (podcastActive) {
+          podcastStart = Math.min(Date.now(), podcastStart + 15000 / podcastRate);
+        }
+      };
+      document.getElementById('pod-skip-fwd-btn').onclick = () => {
+        if (podcastActive) {
+          podcastStart = Math.max(podcastStart - 15000 / podcastRate, Date.now() - podcastDuration);
+        }
+      };
+    };
+
+    const selectPodcast = document.getElementById('podcast-subtopic-select');
+    if (selectPodcast) {
+      selectPodcast.onchange = updatePodcastView;
+      updatePodcastView();
+    }
+
+    // --- References Controller ---
+    const updateRefsView = () => {
+      const select = document.getElementById('refs-subtopic-select');
+      if (!select) return;
+      const subtopicIdx = parseInt(select.value);
+      const subtopic = mod.subtopics[subtopicIdx];
+      const viewer = document.getElementById('refs-viewer-panel');
+      if (viewer && subtopic) {
+        viewer.innerHTML = subtopic.refs || '<p>No references available.</p>';
+      }
+    };
+
+    const selectRefs = document.getElementById('refs-subtopic-select');
+    if (selectRefs) {
+      selectRefs.onchange = updateRefsView;
+      updateRefsView();
+    }
+
+    // --- Embedded Simulators Controller ---
+    const updateSimView = () => {
+      const select = document.getElementById('sim-subtopic-select');
+      if (!select) return;
+      const topic_id = select.value;
+      const viewer = document.getElementById('sim-viewer-panel');
+      if (!viewer) return;
+      
+      const subtopic = mod.subtopics.find(st => st.topic_id === topic_id);
+      if (!subtopic) return;
+      
+      // Inject simulation HTML and run script inside it
+      viewer.innerHTML = subtopic.sim;
+      
+      // Execute any script tags in the sim HTML
+      const scripts = viewer.querySelectorAll('script');
+      scripts.forEach(s => {
+        try {
+          const runScript = new Function(s.textContent);
+          runScript();
+        } catch (err) {
+          console.error("Error executing simulation script:", err);
+        }
+      });
+    };
+
+    const selectSim = document.getElementById('sim-subtopic-select');
+    if (selectSim) {
+      selectSim.onchange = updateSimView;
+      updateSimView();
+    }
   }
 };
 
